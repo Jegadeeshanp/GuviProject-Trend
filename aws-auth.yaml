@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    # Jenkins EC2 IAM Role (CI/CD)
+    - rolearn: arn:aws:iam::679720146619:role/main-ec2-role
+      username: jenkins
+      groups:
+        - system:masters
+
+    # EKS Managed Node Group Role (Worker Nodes)
+    - rolearn: arn:aws:iam::679720146619:role/trend-ng-eks-node-group-20251121202330775200000001
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+
