@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB = credentials('dockerhub-creds')   // Jenkins DockerHub credentials ID
+        DOCKERHUB = credentials('dockerhub-creds')  // Jenkins credential
         IMAGE = "jegadeeshanjeggy/trend-app:v1"
-        AWS_REGION = "eu-north-1"                    // FIXED REGION
+        AWS_REGION = "us-east-1"
         CLUSTER_NAME = "trend-cluster-new"
-        KUBECONFIG_PATH = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -44,16 +43,7 @@ pipeline {
         stage('Update kubeconfig') {
             steps {
                 sh """
-                echo "Updating kubeconfig for EKS cluster $CLUSTER_NAME in region $AWS_REGION..."
-
-                mkdir -p /var/lib/jenkins/.kube
-
-                aws eks update-kubeconfig \
-                    --name $CLUSTER_NAME \
-                    --region $AWS_REGION \
-                    --kubeconfig $KUBECONFIG_PATH
-
-                echo "KUBECONFIG file generated."
+                aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
                 """
             }
         }
@@ -61,16 +51,13 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 sh """
-                export KUBECONFIG=$KUBECONFIG_PATH
-
-                echo "Applying Kubernetes manifests..."
                 kubectl apply -f deployment.yaml
                 kubectl apply -f service.yaml
 
-                echo "Waiting for rollout..."
-                kubectl rollout status deployment/trend-app-deployment --timeout=180s || true
+                echo "Wait for rollout..."
+                kubectl rollout status deployment/trend-app-deployment || true
 
-                echo "Pods:"
+                echo "Current Pods:"
                 kubectl get pods -o wide
 
                 echo "Services:"
