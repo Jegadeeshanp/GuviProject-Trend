@@ -15,7 +15,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"
-    instance_types = ["t3.small"]     # Free-tier friendly
+    instance_types = ["t3.small"]  
   }
 
   eks_managed_node_groups = {
