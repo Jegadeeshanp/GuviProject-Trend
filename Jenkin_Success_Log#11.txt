@@ -1,0 +1,185 @@
+Started by user Jegadeeshan Panneerselvam
+Obtained Jenkinsfile from git https://github.com/Jegadeeshanp/GuviProject-Trend.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/GuviProjectTrend
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+The recommended git tool is: git
+using credential dockerhub-creds
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/GuviProjectTrend/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Jegadeeshanp/GuviProject-Trend.git # timeout=10
+Fetching upstream changes from https://github.com/Jegadeeshanp/GuviProject-Trend.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.34.1'
+using GIT_ASKPASS to set credentials dockerhub-creds
+ > git fetch --tags --force --progress -- https://github.com/Jegadeeshanp/GuviProject-Trend.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 6a3df0364c573966ffc53e37711592d4f65101aa (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 6a3df0364c573966ffc53e37711592d4f65101aa # timeout=10
+Commit message: "Delete JenkinsfileOld"
+ > git rev-list --no-walk 6a3df0364c573966ffc53e37711592d4f65101aa # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $DOCKERHUB or $DOCKERHUB_PSW
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone Repository)
+[Pipeline] git
+The recommended git tool is: git
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/GuviProjectTrend/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Jegadeeshanp/GuviProject-Trend.git # timeout=10
+Fetching upstream changes from https://github.com/Jegadeeshanp/GuviProject-Trend.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.34.1'
+ > git fetch --tags --force --progress -- https://github.com/Jegadeeshanp/GuviProject-Trend.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 6a3df0364c573966ffc53e37711592d4f65101aa (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 6a3df0364c573966ffc53e37711592d4f65101aa # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D main # timeout=10
+ > git checkout -b main 6a3df0364c573966ffc53e37711592d4f65101aa # timeout=10
+Commit message: "Delete JenkinsfileOld"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker Image)
+[Pipeline] sh
++ docker build -t jegadeeshanjeggy/trend-app:v1 .
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  97.13MB
+Step 1/5 : FROM nginx:alpine
+ ---> d4918ca78576
+Step 2/5 : RUN rm -rf /usr/share/nginx/html/*
+ ---> Using cache
+ ---> 863cbc55a80c
+Step 3/5 : COPY dist/ /usr/share/nginx/html/
+ ---> Using cache
+ ---> 99bb8fb47419
+Step 4/5 : EXPOSE 80
+ ---> Using cache
+ ---> 72bd7ba21208
+Step 5/5 : CMD ["nginx", "-g", "daemon off;"]
+ ---> Using cache
+ ---> d3dccfae3255
+Successfully built d3dccfae3255
+Successfully tagged jegadeeshanjeggy/trend-app:v1
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Login to DockerHub)
+[Pipeline] sh
++ echo ****
++ docker login -u jegadeeshanjeggy --password-stdin
+Login Succeeded
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push Docker Image)
+[Pipeline] sh
++ docker push jegadeeshanjeggy/trend-app:v1
+The push refers to repository [docker.io/jegadeeshanjeggy/trend-app]
+2da3af4a92b2: Preparing
+18d7ebe04d80: Preparing
+25906c27b84d: Preparing
+99ea4bde418d: Preparing
+3297b9628ff3: Preparing
+b74d92be8225: Preparing
+2c79d5d895bb: Preparing
+2660a7d4b906: Preparing
+50b58ca2a3f5: Preparing
+256f393e029f: Preparing
+b74d92be8225: Waiting
+2c79d5d895bb: Waiting
+2660a7d4b906: Waiting
+50b58ca2a3f5: Waiting
+256f393e029f: Waiting
+2da3af4a92b2: Layer already exists
+99ea4bde418d: Layer already exists
+18d7ebe04d80: Layer already exists
+25906c27b84d: Layer already exists
+3297b9628ff3: Layer already exists
+50b58ca2a3f5: Layer already exists
+b74d92be8225: Layer already exists
+2c79d5d895bb: Layer already exists
+256f393e029f: Layer already exists
+2660a7d4b906: Layer already exists
+v1: digest: sha256:ba05f2649dcc80d54ea2abae082ac63ccd845db4221f738be28cd89bce548c68 size: 2407
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Update kubeconfig)
+[Pipeline] sh
++ echo Updating kubeconfig for EKS cluster trend-cluster-new in region eu-north-1...
+Updating kubeconfig for EKS cluster trend-cluster-new in region eu-north-1...
++ mkdir -p /var/lib/jenkins/.kube
++ aws eks update-kubeconfig --name trend-cluster-new --region eu-north-1 --kubeconfig /var/lib/jenkins/.kube/config
+Updated context arn:aws:eks:eu-north-1:679720146619:cluster/trend-cluster-new in /var/lib/jenkins/.kube/config
++ echo KUBECONFIG file generated.
+KUBECONFIG file generated.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy to EKS)
+[Pipeline] sh
++ export KUBECONFIG=/var/lib/jenkins/.kube/config
++ echo Applying Kubernetes manifests...
+Applying Kubernetes manifests...
++ kubectl apply -f deployment.yaml
+deployment.apps/trend-app-deployment configured
++ kubectl apply -f service.yaml
+service/trend-app-service configured
++ echo Waiting for rollout...
+Waiting for rollout...
++ kubectl rollout status deployment/trend-app-deployment --timeout=180s
+Waiting for deployment "trend-app-deployment" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "trend-app-deployment" rollout to finish: 1 old replicas are pending termination...
+deployment "trend-app-deployment" successfully rolled out
++ echo Pods:
+Pods:
++ kubectl get pods -o wide
+NAME                                    READY   STATUS        RESTARTS   AGE   IP           NODE                                        NOMINATED NODE   READINESS GATES
+nginx-7854ff8877-pslhp                  1/1     Running       0          80m   10.0.1.26    ip-10-0-1-161.eu-north-1.compute.internal   <none>           <none>
+trend-app-deployment-7799fb6cbd-t2tg8   0/1     Terminating   0          4s    10.0.1.249   ip-10-0-1-161.eu-north-1.compute.internal   <none>           <none>
+trend-app-deployment-7895fb9454-b2n7q   1/1     Running       0          2s    10.0.1.36    ip-10-0-1-161.eu-north-1.compute.internal   <none>           <none>
+trend-app-deployment-7895fb9454-jjztg   1/1     Running       0          4s    10.0.1.122   ip-10-0-1-161.eu-north-1.compute.internal   <none>           <none>
++ echo Services:
+Services:
++ kubectl get svc -o wide
+NAME                TYPE           CLUSTER-IP      EXTERNAL-IP                                                                PORT(S)          AGE     SELECTOR
+kubernetes          ClusterIP      172.20.0.1      <none>                                                                     443/TCP          4h11m   <none>
+nginx               LoadBalancer   172.20.85.215   a84180a5e414b496c8eb7a6407adf96c-1373524327.eu-north-1.elb.amazonaws.com   80:30247/TCP     78m     app=nginx
+trend-app-service   LoadBalancer   172.20.72.233   af8f2975c265344b0a83fc93a4977d53-1236729486.eu-north-1.elb.amazonaws.com   3000:30613/TCP   49m     app=trend-app
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Deployment to EKS Successful!
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
