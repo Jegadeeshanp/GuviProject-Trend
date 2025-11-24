@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB = credentials('dockerhub-creds')   // Jenkins DockerHub credentials ID
+        DOCKERHUB = credentials('dockerhub-creds')  
         IMAGE = "jegadeeshanjeggy/trend-app:v1"
-        AWS_REGION = "eu-north-1"                    // FIXED REGION
+        AWS_REGION = "eu-north-1"                   
         CLUSTER_NAME = "trend-cluster-new"
         KUBECONFIG_PATH = "/var/lib/jenkins/.kube/config"
     }
